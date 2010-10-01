@@ -2,7 +2,7 @@ class Feature < ActiveRecord::Base
 
   acts_as_indexed :fields => [:title, :description]
 
-  has_geom :the_geom => RefinerySetting.find_or_set(:feature_geom_type, 'point').to_sym
+  has_geom :the_geom => self.feature_geom_type if self.feature_geom_type
 
   validates_presence_of :title
   validates_uniqueness_of :title
@@ -27,6 +27,8 @@ ATT
       att, type = att_type.split(':')
       [att.strip, type.strip]
     end
+  rescue
+    []
   end
 
   def self.set_default_refinery_attributes
@@ -50,7 +52,9 @@ ATT
   end
 
   def self.feature_geom_type
-    RefinerySetting.get(:feature_geom_type)
+    RefinerySetting.find_or_set(:feature_geom_type, 'point').to_sym
+  rescue
+    nil
   end
 
 end
