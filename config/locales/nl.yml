@@ -1,0 +1,19 @@
+nl:
+  plugins:
+    features:
+      title: Features
+  admin:
+    features:
+      index:
+        create_new: Maak een nieuwe Feature
+        reorder: Wijzig de volgorde van de Features
+        reorder_done: Klaar met het wijzingen van de volgorde van de Features
+        sorry_no_results: Helaas! Er zijn geen resultaten gevonden.
+        no_items_yet: Er zijn nog geen Features. Druk op 'Maak een nieuwe Feature' om de eerste aan te maken.
+      feature:
+        view_live: Bekijk deze feature op de website <br/><em>(opent een nieuw venster)</em>
+        edit: Bewerk deze feature
+        delete: Verwijder deze feature voor eeuwig
+  features:
+    show:
+      other: Andere Features

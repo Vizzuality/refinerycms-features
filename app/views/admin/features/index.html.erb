@@ -1,0 +1,65 @@
+<div id='actions'>
+  <ul>
+    <li>
+      <%= render :partial => "/shared/admin/search",
+                  :locals => {
+                    :url => admin_features_url
+                  } %>
+    </li>
+    <li>
+      <%= link_to t('.create_new'), new_admin_feature_url,
+                   :class => "add_icon" %>
+    </li>
+  <% if !searching? and Feature.count > 1 %>
+    <li>
+      <%= link_to t('refinery.reorder', :what => "Features"),
+                   admin_features_url,
+                   :id => "reorder_action",
+                   :class => "reorder_icon" %>
+
+      <%= link_to t('refinery.reorder_done', :what => "Features"),
+                   admin_features_url,
+                   :id => "reorder_action_done",
+                   :style => "display: none;",
+                   :class => "reorder_icon" %>
+    </li>
+  <% end %>
+  </ul>
+</div>
+<div id='records'>
+  <% if searching? %>
+    <h2><%= t('shared.admin.search.results_for', :query => params[:search]) %></h2>
+    <% if @features.any? %>
+      <%= will_paginate @features, :previous_label => '&laquo;', :next_label => '&raquo;' %>
+      <ul>
+        <%= render :partial => "feature",
+                    :collection => @features %>
+      </ul>
+      <%= will_paginate @features, :previous_label => '&laquo;', :next_label => '&raquo;' %>
+    <% else %>
+      <p><%= t('shared.admin.search.no_results') %></p>
+    <% end %>
+  <% else %>
+    <% if @features.any? %>
+      <%= will_paginate @features,
+                         :previous_label => '&laquo;',
+                         :next_label => '&raquo;' %>
+
+      <%= render :partial => "sortable_list" %>
+
+      <%= will_paginate @features,
+                         :previous_label => '&laquo;',
+                         :next_label => '&raquo;' %>
+    <% else %>
+      <p>
+        <strong>
+          <%= t('.no_items_yet') %>
+        </strong>
+      </p>
+    <% end %>
+  <% end %>
+</div>
+<%= render :partial => "/shared/admin/make_sortable",
+            :locals => {
+              :tree => false
+            } if !searching? and Feature.count > 1 %>

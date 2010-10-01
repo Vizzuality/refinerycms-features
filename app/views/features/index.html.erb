@@ -1,0 +1,11 @@
+<% content_for :body_content_left do %>
+  <ul id="features">
+    <% @features.each do |feature| %>
+      <li>
+        <%= link_to feature.title, feature_url(feature) %>
+      </li>
+    <% end %>
+  </ul>
+<% end %>
+
+<%= render :partial => "/shared/content_page" %>

@@ -1,0 +1,19 @@
+nb:
+  plugins:
+    features:
+      title: Features
+  admin:
+    features:
+      index:
+        create_new: Lag en ny Feature
+        reorder: Endre rekkefølgen på Features
+        reorder_done: Ferdig å endre rekkefølgen Features
+        sorry_no_results: Beklager! Vi fant ikke noen resultater.
+        no_items_yet: Det er ingen Features enda. Klikk på "Lag en ny Feature" for å legge til din første feature.
+      feature:
+        view_live: Vis hvordan denne feature ser ut offentlig <br/><em>(åpner i et nytt vindu)</em>
+        edit: Rediger denne feature
+        delete: Fjern denne feature permanent
+  features:
+    show:
+      other: Andre Features

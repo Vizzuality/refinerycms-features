@@ -1,0 +1,27 @@
+en:
+  shared:
+    admin:
+      image_picker:
+        image: image
+  plugins:
+    features:
+      title: Features
+  admin:
+    features:
+      gallery_picker:
+        none_selected: You haven't selected a Gallery. Pick one
+        change: Chose one
+        remove_current: "Remove current"
+      index:
+        create_new: Create a new Feature
+        reorder: Reorder Features
+        reorder_done: Done Reordering Features
+        sorry_no_results: Sorry! There are no results found.
+        no_items_yet: There are no Features yet. Click "Create a new Feature" to add your first feature.
+      feature:
+        view_live: View this feature live <br/><em>(opens in a new window)</em>
+        edit: Edit this feature
+        delete: Remove this feature forever
+  features:
+    show:
+      other: Other Features

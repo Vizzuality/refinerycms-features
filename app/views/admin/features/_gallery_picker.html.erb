@@ -1,0 +1,128 @@
+<%
+  description ||= "gallery"
+  thumbnail ||= "225x255>"
+  image ||= (gallery && !gallery.gallery_entries.empty?) ? gallery.gallery_entries.first.image : nil
+  randomiser = rand(Time.now.yesterday.to_i * Time.now.to_i)
+  current_gallery_link_href = insert_admin_galleries_url(:dialog => true,
+                                                        :callback => "gallery_picker_#{randomiser}_changed",
+                                                        :width => 866,
+                                                        :height => 510)
+  current_gallery_title = t('.change', :what =>  description.titleize)
+-%>
+<%= f.hidden_field field, :id => "current_gallery_id_#{randomiser}" -%>
+
+<div id='current_gallery_container_<%= randomiser %>' style="margin-top: 10px;">
+  <a id='current_gallery_link_<%= randomiser %>' href="<%= current_gallery_link_href %>" style='border: 0px' title='<%= current_gallery_title  %>' name='<%= current_gallery_title %>' class='dialog'>
+    <% unless gallery.nil? -%>
+      <%= image_fu image, thumbnail,
+                   :class => "brown_border",
+                   :id => "current_picked_gallery_#{randomiser}" %>
+    <% else -%>
+      <img id="current_picked_gallery_<%= randomiser %>" class="" src="" alt="" style='display: none' />
+    <% end -%>
+    <span id='no_picked_gallery_selected_<%= randomiser %>' class='nothing_selected' <%= "style='display: none;'" if gallery.present? %>>
+      <%= t('.none_selected', :what => t('.' + description )) %>
+    </span>
+  </a>
+  <br/>
+  <%= link_to t('.remove_current', :what => t('.' + description )), "#",
+              :id => "remove_picked_gallery_#{randomiser}",
+              :style => "#{"display:none;" if gallery.nil?}" %>
+</div>
+
+<%#
+  We're so un-object-oriented here. We need to rewrite the jQuery admin.js file to use OO.
+%>
+<% content_for :head do -%>
+  <script type='text/javascript'>
+    var gallery_picker_<%= randomiser %>_options = {
+      thumbnail: '<%= thumbnail.html_safe %>'
+      , gallery_toggler: "null"
+      , description: '<%= description %>'
+      , field: '#current_gallery_id_<%= randomiser %>'
+      , gallery_display: '#current_picked_gallery_<%= randomiser %>'
+      , no_gallery_message: '#no_picked_gallery_selected_<%= randomiser %>'
+      , remove_gallery_button: '#remove_picked_gallery_<%= randomiser %>'
+      , gallery_container: '#current_gallery_container_<%= randomiser %>'
+    };
+
+    var gallery_picker = {
+      options: {
+        selected: '',
+        thumbnail: 'dialog_thumb',
+        field: '#gallery',
+        gallery_display: '#current_picked_gallery',
+        no_gallery_message: '#no_picked_gallery_selected',
+        gallery_container: '#current_gallery_container',
+        remove_gallery_button: '#remove_picked_gallery',
+        gallery_toggler: null
+      }
+
+      , init: function(new_options){
+        this.options = $.extend(this.options, new_options);
+        $(this.options.remove_gallery_button).click($.proxy(this.remove_gallery, this));
+        $(this.options.gallery_toggler).click($.proxy(this.toggle_gallery, this));
+      }
+
+      , remove_gallery: function(e) {
+        e.preventDefault();
+        $(this.options.gallery_display).removeClass('brown_border')
+                                  .attr({'src': '', 'width': '', 'height': ''})
+                                  .css({'width': 'auto', 'height': 'auto'})
+                                  .hide();
+        $(this.options.field).val('');
+        $(this.options.no_gallery_message).show();
+        $(this.options.remove_gallery_button).hide();
+        $(this).hide();
+      }
+
+      , toggle_gallery: function(e) {
+        $(this.options.gallery_toggler).html(($(this.options.gallery_toggler).html() == 'Show' ? 'Hide' : 'Show'));
+        $(this.options.gallery_container).toggle();
+        e.preventDefault();
+      }
+
+      , changed: function(gallery) {
+        $(this.options.field).val(gallery.id.replace("gallery_", ""));
+
+        $.ajax({
+          async: false,
+          url: '/refinery/images/'+$(gallery).attr('data-id')+'/url?size='+this.options.thumbnail,
+          success: function (result, status, xhr) {
+            if (result.error) {
+              if (console && console.log) {
+                 console.log("Something went wrong with the gallery insertion!");
+                 console.log(result);
+               }
+             } else {
+               gallery.src = result.url;
+             }
+           },
+           error: function(xhr, txt, status) {
+             if (console && console.log) {
+               console.log("Something went wrong with the gallery insertion!");
+               console.log(xhr);
+               console.log(txt);
+               console.log(status);
+             }
+           }
+        });
+
+        current_gallery = $(this.options.gallery_display);
+        current_gallery.replaceWith($("<img src='"+gallery.src+"?"+Math.floor(Math.random() * 1000000000)+"' id='"+current_gallery.attr('id')+"' class='brown_border' />"));
+
+        $(this.options.remove_gallery_button).show();
+        $(this.options.no_gallery_message).hide();
+      }
+    }
+
+    $(document).ready(function(e) {
+      gallery_picker.init(gallery_picker_<%= randomiser %>_options);
+    });
+
+    gallery_picker_<%= randomiser %>_changed = function(args) {
+      gallery_picker.init(gallery_picker_<%= randomiser %>_options);
+      gallery_picker.changed(args);
+    }
+  </script>
+<% end %>

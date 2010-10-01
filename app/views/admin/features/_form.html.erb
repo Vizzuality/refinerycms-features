@@ -1,0 +1,56 @@
+<%= form_for [:admin, @feature] do |f| -%>
+  <%= render :partial => "/shared/admin/error_messages", :locals => {
+    :object => @feature,
+    :include_object_name => true
+  } %>
+
+  <div class='field'>
+    <%= f.label :title -%>
+    <%= f.text_field :title, :class => 'larger widest' -%>
+  </div>
+
+  <div class='field'>
+    <%= f.label :description -%>
+    <%= f.text_area :description, :rows => 20, :class => 'wymeditor widest' -%>
+  </div>
+
+  <div class='field'>
+    <%= f.label :gallery_id -%>
+    <%= render :partial => "gallery_picker", :locals => {
+      :f => f,
+      :field => :gallery_id,
+      :gallery => @feature.gallery
+    } %>
+  </div>
+
+  <% Feature.dynamic_attributes.each do |att, type| %>
+  <div class="field">
+    <%= f.label att.to_sym %>
+    <% if type == 'text' %>
+    <%= f.text_area att.to_sym, :rows => 20, :class => 'larger widest' -%>
+    <% else %>
+    <%= f.text_field att.to_sym, :class => 'larger widest' -%>
+    <% end -%>
+  </div>
+  <% end %>
+
+  <div class="field">
+    <%= f.label :the_geom %>
+    <% if Feature.feature_geom_type == 'point' %>
+    UI for managing points
+    <% elsif Feature.feature_geom_type == 'polygon' %>
+    UI for managing polygons
+    <% else %>
+    UI for managing anything
+    <% end -%>
+  </div>
+
+
+  <%= render :partial => "/shared/admin/form_actions",
+              :locals => {
+                :f => f,
+                :continue_editing => false,
+                :delete_title => t('admin.features.feature.delete'),
+                :delete_confirmation => t('shared.admin.delete.message', :title => @feature.title)
+              } %>
+<% end -%>

@@ -1,0 +1,39 @@
+<% content_for :body_content_title do %>
+
+  <%= @feature.title %>
+
+<% end %>
+
+<% content_for :body_content_left do %>
+
+  <div>
+    <h3>Title</h3>
+    <%=raw @feature.title %>
+  </div>
+
+  <div>
+    <h3>Description</h3>
+    <%=raw @feature.description %>
+  </div>
+
+  <div>
+    <h3>Gallery</h3>
+    <%=raw @feature.gallery_id %>
+  </div>
+
+  <!-- The Geom -->
+
+<% end %>
+
+<% content_for :body_content_right do %>
+  <h2><%= t('.other') %></h2>
+  <ul id="features">
+    <% @features.each do |feature| %>
+      <li>
+        <%= link_to feature.title, feature_url(feature) %>
+      </li>
+    <% end %>
+  </ul>
+<% end %>
+
+<%= render :partial => "/shared/content_page" %>
