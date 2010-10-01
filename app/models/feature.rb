@@ -2,6 +2,12 @@ class Feature < ActiveRecord::Base
 
   acts_as_indexed :fields => [:title, :description]
 
+  def self.feature_geom_type
+    RefinerySetting.find_or_set(:feature_geom_type, 'point').to_sym
+  rescue
+    nil
+  end
+
   has_geom :the_geom => self.feature_geom_type if self.feature_geom_type
 
   validates_presence_of :title
@@ -49,12 +55,6 @@ ATT
       self.meta ||= {}
       self.meta[att.to_sym] = value
     end
-  end
-
-  def self.feature_geom_type
-    RefinerySetting.find_or_set(:feature_geom_type, 'point').to_sym
-  rescue
-    nil
   end
 
 end
