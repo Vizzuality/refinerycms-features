@@ -57,4 +57,18 @@ ATT
     end
   end
 
+  def self.srid
+    RefinerySetting.find_or_set(:feature_srid, '4326').to_i
+  end
+
+  def the_geom=(value)
+    from_wkt_to_geom = ActiveRecord::Base.connection.execute("select ST_GeomFromText('#{value}', #{self.class.srid})")[0]['st_geomfromtext']
+    write_attribute(:the_geom, from_wkt_to_geom)
+  end
+
+  def the_geom_to_wkt
+    return nil if self.new_record?
+    ActiveRecord::Base.connection.execute("select ST_AsText(the_geom) from features where id = #{self.id}")[0]['st_astext']
+  end
+
 end

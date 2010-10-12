@@ -5,8 +5,7 @@ class CreateFeatures < ActiveRecord::Migration
       t.string :title
       t.text :description
       t.integer :gallery_id
-      t.geometry :the_geom_point
-      t.geometry :the_geom_polygon
+      t.geometry :the_geom, :srid => 4326, :null => false
       t.string :location
       t.integer :position
 

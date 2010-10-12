@@ -6,7 +6,7 @@ A plugin for [Refinery CMS](http://refinerycms.com/) to manage features. Feature
 
 Add the following line to your `Gemfile` file:
 
-    gem 'refinerycms-features', '= 0.1', :require => 'features', :git => 'git://github.com/Vizzuality/refinerycms-features.git'
+    gem 'refinerycms-features', '= 0.2', :require => 'features', :git => 'git://github.com/Vizzuality/refinerycms-features.git'
 
 And then run `bundle install`.
 

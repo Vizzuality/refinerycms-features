@@ -36,15 +36,192 @@
 
   <div class="field">
     <%= f.label :the_geom %>
-    <% if Feature.feature_geom_type == 'point' %>
-    UI for managing points
-    <% elsif Feature.feature_geom_type == 'polygon' %>
-    UI for managing polygons
-    <% else %>
-    UI for managing anything
-    <% end -%>
-  </div>
+    <%= f.hidden_field :the_geom, :value => @feature.the_geom? ? @feature.the_geom_to_wkt : nil -%>
 
+    <div id="map" class="smallmap" style="height:400px;"></div>
+
+    <% if Feature.feature_geom_type == :point %>
+
+<script type="text/javascript">
+$(document).ready(function() {
+  OpenLayers.DOTS_PER_INCH = 90.71428571428572;
+  OpenLayers.Util.onImageLoadErrorColor = 'transparent';
+
+  var options = {
+    resolutions: [50694.68146875, 25347.340734375, 12673.6703671875, 6336.83518359375, 3168.417591796875, 1584.2087958984375, 792.1043979492188, 396.0521989746094, 198.0260994873047, 99.01304974365235, 49.50652487182617, 24.753262435913086, 12.376631217956543, 6.188315608978272, 3.094157804489136, 1.547078902244568, 0.773539451122284, 0.386769725561142, 0.193384862780571, 0.0966924313902855, 0.04834621569514275, 0.024173107847571373, 0.012086553923785687, 0.006043276961892843, 0.0030216384809464217],
+    projection: new OpenLayers.Projection('EPSG:3031'),
+    maxExtent: new OpenLayers.Bounds(-6267731.972,-5502339.632,6710106.484,7475498.824),
+    units: "meters",
+    numZoomLevels:4
+  };
+
+  var map = new OpenLayers.Map('map', options);
+  var gphy = new OpenLayers.Layer.Google(
+      "Google Physical",
+      {type: google.maps.MapTypeId.TERRAIN, numZoomLevels: 18}
+  );
+
+  var layer = new OpenLayers.Layer.Vector();
+
+  var panelControlsEdit = [
+   new OpenLayers.Control.Navigation(),
+   new OpenLayers.Control.ModifyFeature(layer, {
+     mode: OpenLayers.Control.ModifyFeature.DRAG
+   })
+  ];
+
+  <% unless @feature.the_geom %>
+  var panelControls = [
+   new OpenLayers.Control.Navigation(),
+   new OpenLayers.Control.DrawFeature(layer,
+       OpenLayers.Handler.Point,
+       {'displayClass': 'olControlDrawFeaturePoint'}),
+   new OpenLayers.Control.ModifyFeature(layer, {
+     mode: OpenLayers.Control.ModifyFeature.DRAG
+   })
+  ];
+
+  var toolbar = new OpenLayers.Control.Panel({
+     displayClass: 'olControlEditingToolbar',
+     defaultControl: panelControls[0]
+  });
+  toolbar.addControls(panelControls);
+
+  <% else %>
+  var toolbar = new OpenLayers.Control.Panel({
+     displayClass: 'olControlEditingToolbar',
+     defaultControl: panelControlsEdit[1]
+  });
+  toolbar.addControls(panelControlsEdit);
+
+  var wkt = new OpenLayers.Format.WKT()
+  var features = wkt.read('<%= @feature.the_geom_to_wkt %>');
+  layer.addFeatures(features);
+  <% end -%>
+
+  map.addControl(toolbar);
+
+  layer.events.on({
+    "featureadded": function(evt){
+      $('#feature_the_geom').val(evt.feature.geometry);
+      toolbar.destroy();
+      toolbar = new OpenLayers.Control.Panel({
+         displayClass: 'olControlEditingToolbar',
+         defaultControl: panelControlsEdit[1]
+      });
+      toolbar.addControls(panelControlsEdit);
+      map.addControl(toolbar);
+    },
+    "featuremodified": function(evt){
+      $('#feature_the_geom').val(evt.feature.geometry);
+    }
+  });
+
+  map.addLayers([gphy, layer]);
+  <% unless @feature.the_geom %>
+  map.setCenter(new OpenLayers.LonLat(-71, -20), 3);
+  <% else %>
+  map.setCenter(new OpenLayers.LonLat(<%= @feature.the_geom.lon %>, <%= @feature.the_geom.lat %>), 3);
+  <% end -%>
+
+});
+</script>
+
+    <% elsif Feature.feature_geom_type == :polygon %>
+
+    <script type="text/javascript">
+    $(document).ready(function() {
+      OpenLayers.DOTS_PER_INCH = 90.71428571428572;
+      OpenLayers.Util.onImageLoadErrorColor = 'transparent';
+
+      var options = {
+        resolutions: [50694.68146875, 25347.340734375, 12673.6703671875, 6336.83518359375, 3168.417591796875, 1584.2087958984375, 792.1043979492188, 396.0521989746094, 198.0260994873047, 99.01304974365235, 49.50652487182617, 24.753262435913086, 12.376631217956543, 6.188315608978272, 3.094157804489136, 1.547078902244568, 0.773539451122284, 0.386769725561142, 0.193384862780571, 0.0966924313902855, 0.04834621569514275, 0.024173107847571373, 0.012086553923785687, 0.006043276961892843, 0.0030216384809464217],
+        projection: new OpenLayers.Projection('EPSG:3031'),
+        maxExtent: new OpenLayers.Bounds(-6267731.972,-5502339.632,6710106.484,7475498.824),
+        units: "meters",
+        numZoomLevels:4
+      };
+
+      var map = new OpenLayers.Map('map', options);
+      var gphy = new OpenLayers.Layer.Google(
+          "Google Physical",
+          {type: google.maps.MapTypeId.TERRAIN, numZoomLevels: 18}
+      );
+
+      var layer = new OpenLayers.Layer.Vector();
+
+      var panelControlsEdit = [
+        new OpenLayers.Control.Navigation(),
+        new OpenLayers.Control.ModifyFeature(layer, {
+          mode: OpenLayers.Control.ModifyFeature.DRAG | OpenLayers.Control.ModifyFeature.RESHAPE
+        })
+      ];
+
+      <% unless @feature.the_geom %>
+      var panelControls = [
+        new OpenLayers.Control.Navigation(),
+        new OpenLayers.Control.DrawFeature(layer,
+            OpenLayers.Handler.Polygon,
+            {'displayClass': 'olControlDrawFeaturePoint'}),
+        new OpenLayers.Control.ModifyFeature(layer, {
+            mode: OpenLayers.Control.ModifyFeature.DRAG | OpenLayers.Control.ModifyFeature.RESHAPE
+       })
+      ];
+
+      var toolbar = new OpenLayers.Control.Panel({
+         displayClass: 'olControlEditingToolbar',
+         defaultControl: panelControls[0]
+      });
+      toolbar.addControls(panelControls);
+      <% else %>
+      var toolbar = new OpenLayers.Control.Panel({
+         displayClass: 'olControlEditingToolbar',
+         defaultControl: panelControlsEdit[1]
+      });
+      toolbar.addControls(panelControlsEdit);
+
+      var wkt = new OpenLayers.Format.WKT()
+      var features = wkt.read('<%= @feature.the_geom_to_wkt %>');
+      layer.addFeatures(features);
+      <% end -%>
+
+      map.addControl(toolbar);
+
+      layer.events.on({
+        "featureadded": function(evt){
+          $('#feature_the_geom').val(evt.feature.geometry);
+          toolbar.destroy();
+          toolbar = new OpenLayers.Control.Panel({
+             displayClass: 'olControlEditingToolbar',
+             defaultControl: panelControlsEdit[1]
+          });
+          toolbar.addControls(panelControlsEdit);
+          map.addControl(toolbar);
+        },
+        "featuremodified": function(evt){
+          $('#feature_the_geom').val(evt.feature.geometry);
+        }
+      });
+
+      map.addLayers([gphy, layer]);
+      <% unless @feature.the_geom %>
+      map.setCenter(new OpenLayers.LonLat(-71, -20), 3);
+      <% else %>
+      map.setCenter(new OpenLayers.LonLat(<%= @feature.centroid.lon %>, <%= @feature.centroid.lat %>), 3);
+
+      <% end -%>
+
+    });
+
+    </script>
+
+    <% else %>
+
+    TODO: UI for managing anything else
+
+    <% end -%>
+
+  </div>
 
   <%= render :partial => "/shared/admin/form_actions",
               :locals => {
@@ -53,4 +230,5 @@
                 :delete_title => t('admin.features.feature.delete'),
                 :delete_confirmation => t('shared.admin.delete.message', :title => @feature.title)
               } %>
+
 <% end -%>
