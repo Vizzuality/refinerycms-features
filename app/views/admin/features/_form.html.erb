@@ -44,13 +44,13 @@
 
 <script type="text/javascript">
 $(document).ready(function() {
-  OpenLayers.DOTS_PER_INCH = 90.71428571428572;
   OpenLayers.Util.onImageLoadErrorColor = 'transparent';
 
+  var projection = new OpenLayers.Projection("EPSG:900913");
+  var destProjection = new OpenLayers.Projection("EPSG:4326");
+
   var options = {
-    resolutions: [50694.68146875, 25347.340734375, 12673.6703671875, 6336.83518359375, 3168.417591796875, 1584.2087958984375, 792.1043979492188, 396.0521989746094, 198.0260994873047, 99.01304974365235, 49.50652487182617, 24.753262435913086, 12.376631217956543, 6.188315608978272, 3.094157804489136, 1.547078902244568, 0.773539451122284, 0.386769725561142, 0.193384862780571, 0.0966924313902855, 0.04834621569514275, 0.024173107847571373, 0.012086553923785687, 0.006043276961892843, 0.0030216384809464217],
-    projection: new OpenLayers.Projection('EPSG:3031'),
-    maxExtent: new OpenLayers.Bounds(-6267731.972,-5502339.632,6710106.484,7475498.824),
+    projection: projection,
     units: "meters",
     numZoomLevels:4
   };
@@ -103,7 +103,8 @@ $(document).ready(function() {
 
   layer.events.on({
     "featureadded": function(evt){
-      $('#feature_the_geom').val(evt.feature.geometry);
+      var new_geometry = evt.feature.geometry.clone();
+      $('#feature_the_geom').val(new_geometry.transform(projection, destProjection));
       toolbar.destroy();
       toolbar = new OpenLayers.Control.Panel({
          displayClass: 'olControlEditingToolbar',
@@ -113,7 +114,8 @@ $(document).ready(function() {
       map.addControl(toolbar);
     },
     "featuremodified": function(evt){
-      $('#feature_the_geom').val(evt.feature.geometry);
+      var new_geometry = evt.feature.geometry.clone();
+      $('#feature_the_geom').val(new_geometry.transform(projection, destProjection));
     }
   });
 
@@ -131,13 +133,13 @@ $(document).ready(function() {
 
     <script type="text/javascript">
     $(document).ready(function() {
-      OpenLayers.DOTS_PER_INCH = 90.71428571428572;
       OpenLayers.Util.onImageLoadErrorColor = 'transparent';
 
+      var projection = new OpenLayers.Projection("EPSG:900913");
+      var destProjection = new OpenLayers.Projection("EPSG:4326");
+
       var options = {
-        resolutions: [50694.68146875, 25347.340734375, 12673.6703671875, 6336.83518359375, 3168.417591796875, 1584.2087958984375, 792.1043979492188, 396.0521989746094, 198.0260994873047, 99.01304974365235, 49.50652487182617, 24.753262435913086, 12.376631217956543, 6.188315608978272, 3.094157804489136, 1.547078902244568, 0.773539451122284, 0.386769725561142, 0.193384862780571, 0.0966924313902855, 0.04834621569514275, 0.024173107847571373, 0.012086553923785687, 0.006043276961892843, 0.0030216384809464217],
-        projection: new OpenLayers.Projection('EPSG:3031'),
-        maxExtent: new OpenLayers.Bounds(-6267731.972,-5502339.632,6710106.484,7475498.824),
+        projection: projection,
         units: "meters",
         numZoomLevels:4
       };
@@ -187,9 +189,11 @@ $(document).ready(function() {
 
       map.addControl(toolbar);
 
+
       layer.events.on({
         "featureadded": function(evt){
-          $('#feature_the_geom').val(evt.feature.geometry);
+          var new_geometry = evt.feature.geometry.clone();
+          $('#feature_the_geom').val(new_geometry.transform(projection, destProjection));
           toolbar.destroy();
           toolbar = new OpenLayers.Control.Panel({
              displayClass: 'olControlEditingToolbar',
@@ -199,7 +203,8 @@ $(document).ready(function() {
           map.addControl(toolbar);
         },
         "featuremodified": function(evt){
-          $('#feature_the_geom').val(evt.feature.geometry);
+          var new_geometry = evt.feature.geometry.clone();
+          $('#feature_the_geom').val(new_geometry.transform(projection, destProjection));
         }
       });
 
@@ -208,9 +213,7 @@ $(document).ready(function() {
       map.setCenter(new OpenLayers.LonLat(-71, -20), 3);
       <% else %>
       map.setCenter(new OpenLayers.LonLat(<%= @feature.centroid.lon %>, <%= @feature.centroid.lat %>), 3);
-
       <% end -%>
-
     });
 
     </script>

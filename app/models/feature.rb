@@ -11,6 +11,7 @@ class Feature < ActiveRecord::Base
   has_geom :the_geom => self.feature_geom_type if self.feature_geom_type
 
   validates_presence_of :title
+  validates_presence_of :the_geom
   validates_uniqueness_of :title
 
   serialize :meta, Hash
