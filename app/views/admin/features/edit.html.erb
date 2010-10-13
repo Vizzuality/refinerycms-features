@@ -10,10 +10,8 @@
       bottom: 2px;
   }
   </style>
-  <% js_caching = RefinerySetting.find_or_set(:use_resource_caching, Rails.root.writable?) %>
   <script src="http://maps.google.com/maps/api/js?sensor=false"></script>
-  <%= javascript_include_tag 'OpenLayers',
-                             :cache => (js_caching ? "cache/jquery-plugins" : false) -%>
+  <%= javascript_include_tag 'OpenLayers', :cache => false -%>
 <% end -%>
 
 <%= render :partial => "form" %>
