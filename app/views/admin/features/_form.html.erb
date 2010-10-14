@@ -1,3 +1,5 @@
+lalalalalla
+
 <%= form_for [:admin, @feature] do |f| -%>
   <%= render :partial => "/shared/admin/error_messages", :locals => {
     :object => @feature,
@@ -96,6 +98,7 @@ $(document).ready(function() {
 
   var wkt = new OpenLayers.Format.WKT()
   var features = wkt.read('<%= @feature.the_geom_to_wkt %>');
+  features.geometry.transform(destProjection, projection);
   layer.addFeatures(features);
   <% end -%>
 
@@ -123,7 +126,7 @@ $(document).ready(function() {
   <% unless @feature.the_geom %>
   map.setCenter(new OpenLayers.LonLat(-71, -20), 3);
   <% else %>
-  map.setCenter(new OpenLayers.LonLat(<%= @feature.the_geom.lon %>, <%= @feature.the_geom.lat %>), 3);
+  map.setCenter(features.lonlat, 2);
   <% end -%>
 
 });
@@ -184,6 +187,7 @@ $(document).ready(function() {
 
       var wkt = new OpenLayers.Format.WKT()
       var features = wkt.read('<%= @feature.the_geom_to_wkt %>');
+      features.geometry.transform(destProjection, projection);
       layer.addFeatures(features);
       <% end -%>
 
@@ -212,7 +216,7 @@ $(document).ready(function() {
       <% unless @feature.the_geom %>
       map.setCenter(new OpenLayers.LonLat(-71, -20), 3);
       <% else %>
-      map.setCenter(new OpenLayers.LonLat(<%= @feature.centroid.lon %>, <%= @feature.centroid.lat %>), 3);
+      map.setCenter(features.lonlat, 2);
       <% end -%>
     });
 
