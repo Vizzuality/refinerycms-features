@@ -50,6 +50,22 @@ ATT
     end
   end
 
+  def to_json_attributes
+    attributes = {
+      :title => self.title,
+      :description => self.description,
+      :lat => self.the_geom.lat,
+      :lon => self.the_geom.lon,
+    }
+    self.class.dynamic_attributes.each do |att, type|
+      attributes[att.to_sym] = send(att.to_sym)
+    end
+    if gallery && gallery.gallery_entries.count > 0
+      attributes[:image_url] = gallery.gallery_entries.first.image.thumbnail(:medium).url
+    end
+    attributes
+  end
+
   # Define the setter of the dynamic attributes
   self.dynamic_attributes.each do |att, type|
     define_method "#{att}=" do |value|
